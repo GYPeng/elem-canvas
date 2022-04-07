@@ -1,5 +1,5 @@
 {
-  "name": "el-canvas",
+  "name": "@alex/el-canvas",
   "version": "1.0.0",
   "description": "Canvas rendering library, Sprite manipulation of canvas",
   "main": "dist/index.js",
@@ -29,7 +29,7 @@
     "render"
   ],
   "author": "Alex",
-  "license": "MIT",
+  "license": "MIT License",
   "bugs": {
     "url": "https://github.com/GYPeng/el-canvas/issues"
   },
