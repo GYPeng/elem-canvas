@@ -1,0 +1,722 @@
+import Sprite from "./sprite";
+import LoadManage from "./loadManage";
+import Label from "./label";
+import { ratio } from "./config";
+
+class Root extends Sprite {
+  ctx: any;
+  // ctx: CanvasRenderingContext2D;
+  canvas: HTMLCanvasElement;
+  target: HTMLElement;
+  eventX: number | null;
+  eventY: number | null;
+  eventType: "touchstart" | "touchmove" | "touchend" | "touchcancel";
+  eventObj: TouchEvent | null;
+  eventConsed = true;
+  ghostCanvas: HTMLCanvasElement;
+  ghostCtx: any;
+  eventColorMap: any = [];
+  currentEventColor: String = "#000000";
+
+  viewArea: any;
+  constructor(el) {
+    super({
+      width: el.offsetWidth,
+      height: el.offsetHeight,
+    });
+
+    this.viewArea = {
+      clipX: 0,
+      clipY: 0,
+      clipWidth: this.width,
+      clipHeight: this.height,
+    };
+
+    this.target = el;
+    this.createCanvas();
+    this.frame.call(this);
+  }
+  createCanvas() {
+    this.ghostCanvas = document.createElement("canvas");
+    this.ghostCtx = this.ghostCanvas.getContext("2d");
+
+    this.canvas = document.createElement("canvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.ghostCanvas.width = this.canvas.width = this.width;
+    this.ghostCanvas.height = this.canvas.height = this.height;
+    this.canvas.style.height = "100%";
+    this.canvas.style.width = "100%";
+    this.ghostCanvas.style.height = "100%";
+    this.ghostCanvas.style.width = "100%";
+    this.target.append(this.canvas);
+    // this.target.append(this.ghostCanvas);
+
+    this.canvas.addEventListener(
+      "touchstart",
+      (event: TouchEvent) => {
+        if (!this.eventConsed) {
+          return;
+        }
+        this.eventConsed = false;
+        event.preventDefault();
+        const input = document.getElementById("input-dom") as HTMLInputElement;
+        if (input) {
+          input.blur();
+        }
+        const { targetTouches } = event;
+        const { pageX, pageY } = targetTouches[0];
+        this.eventType = "touchstart";
+        this.eventX = pageX * ratio;
+        this.eventY = pageY * ratio;
+        this.eventObj = event;
+
+        const handlers = this._eventMap["touchstart"];
+        if (this._eventMap["touchstart"]) {
+          for (let j = 0; j < handlers.length; j++) {
+            handlers[j].call(this, event);
+          }
+        }
+      },
+      false
+    );
+
+    this.canvas.addEventListener(
+      "touchmove",
+      (event: TouchEvent) => {
+        if (!this.eventConsed) {
+          return;
+        }
+        this.eventConsed = false;
+        event.preventDefault();
+        const { targetTouches } = event;
+        const { pageX, pageY } = targetTouches[0];
+        this.eventType = "touchmove";
+        this.eventX = pageX * ratio;
+        this.eventY = pageY * ratio;
+        this.eventObj = event;
+
+        const handlers = this._eventMap["touchmove"];
+        if (this._eventMap["touchmove"]) {
+          for (let j = 0; j < handlers.length; j++) {
+            handlers[j].call(this, event);
+          }
+        }
+      },
+      false
+    );
+
+    this.canvas.addEventListener(
+      "touchcancel",
+      (event: TouchEvent) => {
+        const handlers = this._eventMap["touchcancel"];
+        if (this._eventMap["touchcancel"]) {
+          for (let j = 0; j < handlers.length; j++) {
+            handlers[j].call(this, event);
+          }
+        }
+        this.eventColorMap.forEach((m, i) => {
+          const handlers = m.trigger._eventMap["touchcancel"];
+          if (m.trigger._eventMap["touchcancel"]) {
+            for (let j = 0; j < handlers.length; j++) {
+              handlers[j].call(m.trigger, event);
+            }
+          }
+        });
+      },
+      false
+    );
+
+    this.canvas.addEventListener(
+      "touchend",
+      (event: TouchEvent) => {
+        const handlers = this._eventMap["touchend"];
+        if (this._eventMap["touchend"]) {
+          for (let j = 0; j < handlers.length; j++) {
+            handlers[j].call(this, event);
+          }
+        }
+        this.eventColorMap.forEach((m, i) => {
+          const handlers = m.trigger._eventMap["touchend"];
+          if (m.trigger._eventMap["touchend"]) {
+            for (let j = 0; j < handlers.length; j++) {
+              handlers[j].call(m.trigger, event);
+            }
+          }
+        });
+      },
+      false
+    );
+  }
+  async frame() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.currentEventColor = "#000000";
+    this.eventColorMap = [];
+    // try {
+    //   this.ctx.reset();
+    //   this.ghostCtx.reset();
+    // } catch (e) {}
+    await this.deep(this.children);
+    this.eventConsed = true;
+    this.eventObj = null;
+    this.eventX = null;
+    this.eventY = null;
+    requestAnimationFrame(this.frame.bind(this));
+  }
+
+  async deep(children) {
+    const queue = [...children];
+    queue.sort((a, b) => a.zIndex - b.zIndex);
+    for (let i = 0; i < queue.length; i++) {
+      const item = queue[i];
+      let { width, height, name, _eventMap, id, zIndex } = item;
+
+      // 防止多次触发事件
+      // 如果元素隐藏，跳过渲染(也跳过子节点的渲染)
+      // 如果元素为label，跳过
+      if (!item.visible || name === "label") {
+        return;
+      }
+      if (Object.keys(item._eventMap).length) {
+        item.eventLock = false;
+        item.eventColor = this.currentEventColor;
+        this.eventColorMap.push({
+          color: this.currentEventColor,
+          trigger: item,
+        });
+        this.eventColorUp();
+      }
+      const x =
+          item.position === "fixed"
+            ? item.x
+            : (item.parent?.pageX || 0) + (item.x || 0),
+        y =
+          item.position === "fixed"
+            ? item.y
+            : (item.parent?.pageY || 0) + (item.y || 0);
+      item.pageX = x;
+      item.pageY = y;
+
+      // const { overflowX, overflowY, parent } = item;
+      const { overflowX, overflowY, parent } = item;
+      const parentOverflowX = parent.overflowX,
+        parentOverflowY = parent.overflowY;
+      let clipWidth, clipX, clipHeight, clipY;
+      if (parentOverflowX === "hidden") {
+        if (overflowX === "hidden") {
+          // if (id === "test1") {
+          //   console.log(
+          //     x + width,
+          //     parent.viewArea.clipX,
+          //     x,
+          //     parent.viewArea.clipX + parent.viewArea.clipWidth
+          //   );
+          // }
+          if (
+            x + width < parent.viewArea.clipX ||
+            x > parent.viewArea.clipX + parent.viewArea.clipWidth
+          ) {
+            clipWidth = parent.viewArea.clipWidth || this.width;
+            clipX = parent.viewArea.clipX || 0;
+          } else {
+            if (x > parent.viewArea.clipX) {
+              clipX = x;
+              if (
+                parent.viewArea.clipWidth + parent.viewArea.clipX >
+                x + width
+              ) {
+                clipWidth = width;
+              } else {
+                clipWidth = parent.viewArea.clipWidth;
+              }
+            } else {
+              clipX = parent.viewArea.clipX;
+              if (
+                parent.viewArea.clipWidth + parent.viewArea.clipX >
+                x + width
+              ) {
+                clipWidth = width;
+              } else {
+                clipWidth = parent.viewArea.clipWidth;
+              }
+            }
+          }
+        }
+        // overflowX === 'visible'
+        else {
+          clipWidth = parent.viewArea.clipWidth;
+          clipX = parent.viewArea.clipX;
+        }
+      } else {
+        if (overflowX === "hidden") {
+          clipWidth = width;
+          clipX = x;
+        } else {
+          clipX = Math.min(x, parent.viewArea.clipX);
+          if (parent.viewArea.clipX + parent.viewArea.clipWidth > x + width) {
+            clipWidth = parent.viewArea.clipWidth;
+          } else {
+            clipWidth = parent.viewArea.clipWidth + (x + width - clipX);
+          }
+        }
+      }
+      if (parentOverflowY === "hidden") {
+        if (overflowY === "hidden") {
+          if (
+            y + height < parent.viewArea.clipY ||
+            y > parent.viewArea.clipY + parent.viewArea.clipHeight
+          ) {
+            clipHeight = parent.viewArea.clipHeight || this.height;
+            clipY = parent.viewArea.clipY || 0;
+          } else {
+            if (y > parent.viewArea.clipY) {
+              clipY = y;
+              if (
+                parent.viewArea.clipHeight + parent.viewArea.clipY >
+                y + height
+              ) {
+                clipHeight = height;
+              } else {
+                clipHeight = parent.viewArea.clipHeight;
+              }
+            } else {
+              clipY = parent.viewArea.clipY;
+              if (
+                parent.viewArea.clipHeight + parent.viewArea.clipY >
+                y + height
+              ) {
+                clipHeight = height;
+              } else {
+                clipHeight = parent.viewArea.clipHeight;
+              }
+            }
+          }
+        }
+        // overflowY === 'visible'
+        else {
+          clipHeight = parent.viewArea.clipHeight;
+          clipY = parent.viewArea.clipY;
+        }
+      } else {
+        if (overflowY === "hidden") {
+          clipHeight = height;
+          clipY = y;
+        } else {
+          clipY = Math.min(y, parent.viewArea.clipY);
+          if (parent.viewArea.clipY + parent.viewArea.clipHeight > y + height) {
+            clipHeight = parent.viewArea.clipHeight;
+          } else {
+            clipHeight = parent.viewArea.clipHeight + (y + height - clipY);
+          }
+        }
+      }
+
+      item.viewArea = { clipX, clipY, clipWidth, clipHeight };
+
+      this.ghostCtx.save();
+      this.ghostCtx.rect(clipX, clipY, clipWidth, clipHeight);
+      // this.ghostCtx.closePath();
+      // this.ghostCtx.clip();
+      this.ghostCtx.fillStyle = item.eventColor || "#ffffff";
+      this.ghostCtx.fillRect(x, y, width, height);
+      this.ghostCtx.restore();
+      // 防止多次触发事件
+      if (item.eventLock === false && this.eventObj) {
+        item.eventLock = this.eventResolve(item);
+      }
+
+      if (name === "sprite" || name === "scrollbar_ves" || name === "input") {
+        // *********
+        // 超出屏幕，跳过计算
+        if (x > this.width || x + width < 0) {
+          // 横向超出屏幕
+        } else if (y > this.height || y + height < 0) {
+          // 纵向超出屏幕
+        } else {
+          if (!item.canvas) {
+            item.canvas = document.createElement("canvas");
+            item.canvas.width = width;
+            item.canvas.height = height;
+            item.ctx = item.canvas.getContext("2d");
+
+            await this.drawBg({ ...item, x: 0, y: 0 }, item.ctx);
+
+            this.drawBorder({ ...item, x: 0, y: 0 }, item.ctx);
+
+            const label = item.children.filter((v) => v.name === "label");
+            if (label.length) {
+              for (let j = 0; j < label.length; j++) {
+                await this.drawLabel({ ...label[j], x: 0, y: 0 }, item.ctx);
+              }
+            }
+          }
+        }
+
+        if (item.canvas) {
+          this.ctx.save();
+          this.ctx.beginPath();
+          this.ctx.rect(
+            parent.viewArea.clipX,
+            parent.viewArea.clipY,
+            parent.viewArea.clipWidth,
+            parent.viewArea.clipHeight
+          );
+          this.ctx.closePath();
+          this.ctx.clip();
+          this.ctx.drawImage(item.canvas, x, y, width, height);
+          this.ctx.restore();
+        }
+
+        if (item.children) {
+          await this.deep(item.children);
+        }
+      }
+    }
+  }
+  eventColorUp() {
+    const str = this.currentEventColor.replace("#", "");
+    let r = parseInt(str.substring(0, 2), 16),
+      g = parseInt(str.substring(2, 4), 16),
+      b = parseInt(str.substring(4, 6), 16);
+
+    if (b < 255) {
+      b++;
+    } else {
+      b = 0;
+      if (g < 255) {
+        g++;
+      } else {
+        g = 0;
+        if (r < 255) {
+          r++;
+        }
+      }
+    }
+
+    const xR = r.toString(16),
+      xG = g.toString(16),
+      xB = b.toString(16);
+    const result = `#${r > 15 ? xR : "0" + xR}${g > 15 ? xG : "0" + xG}${
+      b > 15 ? xB : "0" + xB
+    }`;
+    this.currentEventColor = result;
+  }
+  eventResolve(argv): boolean {
+    if (this.eventX && this.eventY) {
+      const imageData = this.ghostCtx.getImageData(
+        this.eventX,
+        this.eventY,
+        1,
+        1
+      ).data;
+      const r = imageData[0],
+        g = imageData[1],
+        b = imageData[2];
+
+      const xR = r.toString(16),
+        xG = g.toString(16),
+        xB = b.toString(16);
+
+      const result = `#${r > 15 ? xR : "0" + xR}${g > 15 ? xG : "0" + xG}${
+        b > 15 ? xB : "0" + xB
+      }`;
+
+      if (argv.eventColor === result) {
+        const handlers = argv._eventMap[this.eventType];
+        if (argv._eventMap[this.eventType]) {
+          for (let j = 0; j < handlers.length; j++) {
+            handlers[j].call(argv, this.eventObj);
+          }
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+  async drawLabel(argv: any, ctx: CanvasRenderingContext2D) {
+    let {
+      text,
+      color,
+      x,
+      y,
+      parent,
+      textAlign,
+      stroke,
+      lineHeight,
+      fontSize,
+      fontFamily,
+      underLine,
+      bold,
+    } = argv;
+    let {
+      width,
+      height,
+      borderLeftWidth,
+      borderLeftColor,
+      borderRightColor,
+      borderRightWidth,
+      borderTopColor,
+      borderTopWidth,
+      borderBottomColor,
+      borderBottomWidth,
+    } = parent;
+    ctx.strokeStyle = color || "#000";
+    ctx.textBaseline = "top";
+    ctx.textAlign = "left";
+    ctx.font = `${bold ? "bold" : ""} ${fontSize}px ${fontFamily}`;
+    const textWidth = ctx.measureText(text).width;
+
+    if (borderLeftColor && borderLeftWidth) {
+      x += borderLeftWidth;
+      width -= borderLeftWidth;
+    }
+    if (borderRightColor && borderRightWidth) {
+      width -= borderRightWidth;
+    }
+    if (borderTopColor && borderTopWidth) {
+      y += borderTopWidth;
+      height -= borderTopWidth;
+    }
+    if (borderBottomColor && borderBottomWidth) {
+      height -= borderBottomWidth;
+    }
+
+    ctx.fillStyle = color || "#000";
+    // 单行文本不需要计算超出屏幕部分
+    if (textWidth <= width) {
+      if (textAlign === "center") {
+        x += (width - textWidth) / 2;
+      } else if ((textAlign = "left")) {
+        x = 0;
+      } else {
+        x += width - textWidth;
+      }
+      if (stroke) {
+        ctx.strokeText(text, x, y + (lineHeight - fontSize) / 2, width);
+      } else {
+        ctx.fillText(text, x, y + (lineHeight - fontSize) / 2, width);
+      }
+      if (underLine) {
+        const lineWidth = fontSize / 14;
+        ctx.beginPath();
+        ctx.moveTo(x, y + lineHeight - lineWidth);
+        ctx.lineTo(x + textWidth, y + lineHeight - lineWidth);
+        ctx.closePath();
+        ctx.strokeStyle = underLine;
+        ctx.stroke();
+      }
+    } else {
+      let arr = text.split(""),
+        tmp = "",
+        totalY = 0;
+      while (arr.length || tmp) {
+        const letter = arr[0];
+        const w = ctx.measureText(tmp + letter).width;
+        if (w > width || !arr.length) {
+          const drawW = ctx.measureText(tmp).width;
+          let drawX = x;
+          if (textAlign === "center") {
+            drawX += (width - drawW) / 2;
+          } else if (textAlign === "right") {
+            drawX += width - drawW;
+          }
+
+          // 多行文本，超出屏幕区域的部分，跳过渲染
+          // if (drawX > this.width || drawX + w < 0) {
+          //   // 横向超出屏幕
+          //   tmp = "";
+          //   totalY += lineHeight;
+          //   continue;
+          // } else if (
+          //   y + totalY + (lineHeight - fontSize) / 2 + lineHeight <
+          //   0
+          // ) {
+          //   // 纵向，超出屏幕顶部
+          //   tmp = "";
+          //   totalY += lineHeight;
+          //   continue;
+          // } else if (y + totalY + (lineHeight - fontSize) / 2 > this.height) {
+          //   // 纵向，超出屏幕底部
+          //   return;
+          // }
+
+          if (stroke) {
+            ctx.strokeText(
+              tmp,
+              drawX,
+              y + totalY + (lineHeight - fontSize) / 2,
+              width
+            );
+          } else {
+            ctx.fillText(
+              tmp,
+              drawX,
+              y + totalY + (lineHeight - fontSize) / 2,
+              width
+            );
+          }
+          if (underLine) {
+            const lineWidth = fontSize / 14;
+            ctx.beginPath();
+            ctx.moveTo(
+              drawX,
+              y + totalY + (lineHeight - fontSize) / 2 + lineHeight - lineWidth
+            );
+            ctx.lineTo(
+              drawX + w,
+              y + totalY + (lineHeight - fontSize) / 2 + lineHeight - lineWidth
+            );
+            ctx.closePath();
+            ctx.strokeStyle = underLine;
+            ctx.stroke();
+          }
+          tmp = "";
+          totalY += lineHeight;
+        } else {
+          tmp += arr.shift();
+        }
+      }
+    }
+    ctx.fillStyle = null;
+  }
+  async drawBg(argv: Sprite, ctx: CanvasRenderingContext2D) {
+    let {
+      bgImage,
+      bgColor,
+      width,
+      height,
+      x,
+      y,
+      borderLeftWidth,
+      borderLeftColor,
+      borderRightColor,
+      borderRightWidth,
+      borderTopColor,
+      borderTopWidth,
+      borderBottomColor,
+      borderBottomWidth,
+    } = argv;
+
+    if (borderLeftWidth && borderLeftColor) {
+      x += borderLeftWidth;
+      width -= borderLeftWidth;
+    }
+    if (borderTopWidth && borderTopColor) {
+      y += borderTopWidth;
+      height -= borderTopWidth;
+    }
+    if (borderRightWidth && borderRightColor) {
+      width -= borderRightWidth;
+    }
+    if (borderBottomColor && borderBottomWidth) {
+      height -= borderBottomWidth;
+    }
+
+    if (bgImage) {
+      const img: any = await LoadManage.use(bgImage);
+      ctx.drawImage(img, x, y, width, height);
+    } else if (bgColor) {
+      ctx.fillStyle = bgColor;
+      ctx.beginPath();
+      ctx.fillRect(x, y, width, height);
+      ctx.fillStyle = null;
+      ctx.closePath();
+    }
+  }
+  drawBorder(argv: Sprite, ctx: CanvasRenderingContext2D) {
+    const {
+      width,
+      height,
+      borderLeftWidth,
+      borderLeftColor,
+      borderRightColor,
+      borderRightWidth,
+      borderTopColor,
+      borderTopWidth,
+      borderBottomColor,
+      borderBottomWidth,
+      x,
+      y,
+    } = argv;
+    if (borderLeftWidth && borderLeftColor) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(
+        x + borderLeftWidth,
+        borderTopWidth && borderTopColor ? y + borderTopWidth : y
+      );
+      ctx.lineTo(
+        x + borderLeftWidth,
+        borderBottomWidth && borderBottomColor
+          ? y + (height - borderBottomWidth)
+          : y + height
+      );
+      ctx.lineTo(x, y + height);
+      ctx.closePath();
+      ctx.fillStyle = borderLeftColor;
+      ctx.fill();
+      ctx.fillStyle = null;
+    }
+
+    if (borderTopWidth && borderTopColor) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(
+        borderLeftColor && borderLeftWidth ? x + borderLeftWidth : x,
+        y + borderTopWidth
+      );
+      ctx.lineTo(
+        borderRightColor && borderRightWidth
+          ? x + (width - borderRightWidth)
+          : x + width,
+        y + borderTopWidth
+      );
+      ctx.lineTo(x + width, y);
+      ctx.closePath();
+      ctx.fillStyle = borderTopColor;
+      ctx.fill();
+      ctx.fillStyle = null;
+    }
+
+    if (borderRightWidth && borderRightColor) {
+      ctx.beginPath();
+      ctx.moveTo(x + width, y);
+      ctx.lineTo(
+        x + (width - borderRightWidth),
+        borderTopWidth && borderTopColor ? borderTopWidth + y : y
+      );
+      ctx.lineTo(
+        x + (width - borderRightWidth),
+        borderBottomColor && borderBottomWidth
+          ? y + (height - borderBottomWidth)
+          : y + height
+      );
+      ctx.lineTo(x + width, y + height);
+      ctx.closePath();
+      ctx.fillStyle = borderRightColor;
+      ctx.fill();
+      ctx.fillStyle = null;
+    }
+
+    if (borderBottomWidth && borderBottomColor) {
+      ctx.beginPath();
+      ctx.moveTo(x, y + height);
+      ctx.lineTo(
+        borderLeftColor && borderLeftWidth ? x + borderLeftWidth : x,
+        y + (height - borderBottomWidth)
+      );
+      ctx.lineTo(
+        borderRightColor && borderRightWidth
+          ? x + (width - borderRightWidth)
+          : x + width,
+        y + (height - borderBottomWidth)
+      );
+      ctx.lineTo(x + width, y + height);
+      ctx.closePath();
+      ctx.fillStyle = borderBottomColor;
+      ctx.fill();
+      ctx.fillStyle = null;
+    }
+  }
+}
+
+export default Root;
