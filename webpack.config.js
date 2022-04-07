@@ -2,11 +2,11 @@ const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
-  libraryTarget: "commonjs-module",
   entry: "./src/index.ts",
   output: {
     filename: "index.js",
     path: path.resolve(__dirname, "./dist"),
+    libraryTarget: "commonjs-module",
   },
   resolve: {
     extensions: [".js", ".ts", ".json"],
