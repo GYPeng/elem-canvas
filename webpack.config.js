@@ -6,7 +6,8 @@ module.exports = {
   output: {
     filename: "index.js",
     path: path.resolve(__dirname, "./dist"),
-    libraryTarget: "commonjs2",
+    library: 'finalModule',
+    libraryTarget: 'umd',
   },
   resolve: {
     extensions: [".js", ".ts", ".json"],
