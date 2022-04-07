@@ -4,7 +4,7 @@ import Label from './label'
 import Scrollbox from './scrollbox'
 import Input from './input'
 
-export {
+export default {
   Root,
   Sprite,
   Label,
