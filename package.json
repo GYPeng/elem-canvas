@@ -1,5 +1,5 @@
 {
-  "name": "@alex/el-canvas",
+  "name": "@gypeng.alex/el-canvas",
   "version": "1.0.0",
   "description": "Canvas rendering library, Sprite manipulation of canvas",
   "main": "dist/index.js",
