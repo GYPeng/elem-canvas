@@ -101,6 +101,7 @@ tips: with "?" mark this field as optional
 ## methods
 
 | name | argument | describe |
+|--|--|--|
 | getElementById | id string | returns the node or null |
 | getElementsByClassName | class string | returns the nodes or null |
 | attr | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
