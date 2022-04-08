@@ -13,6 +13,7 @@ class Input extends Sprite {
   borderTopColor: string = "#333";
   borderTopWidth: number = 2;
   value: string = "";
+  placeholder: string = '';
   label: Label;
   constructor(argv: any) {
     super(argv);
@@ -25,9 +26,11 @@ class Input extends Sprite {
     // this.bold = argv.bold === undefined ? false : argv.bold;
     // this.textAlign = argv.textAlign || "center";
     // this.underLine = argv.underLine === undefined ? null : argv.underLine;
+    this.value = argv.value || ''
+    this.placeholder = argv.placeholder || ''
 
     this.label = new Label({
-      text: "",
+      text: this.value || this.placeholder,
       lineHeight: argv.height,
       textAlign: "right",
     });

@@ -2,7 +2,7 @@ import Sprite from "./sprite";
 import { ratio } from "./config";
 
 interface labelPropsTypes {
-  text: string | null;
+  text?: string | null;
   color?: string | null;
   fontFamily?: string;
   bold?: boolean;
@@ -32,7 +32,7 @@ class Label extends Sprite {
       width: 0,
       height: 0,
     });
-    this.text = argv.text;
+    this.text = argv.text || null;
     this.color = argv.color;
     this.stroke = argv.stroke === undefined ? false : argv.stroke;
     this.lineHeight = argv.lineHeight ? argv.lineHeight * ratio : 16 * ratio;
