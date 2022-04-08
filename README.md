@@ -30,16 +30,16 @@ const ves = new Sprite({
 app.append(ves);
 ```
 
-## nodes
+# nodes
 
 1. Sprite
 2. Scrollbox
 3. Input
 4. Label
 
-### Sprite
+# Sprite
 
-#### attributes
+## attributes
 
 tips: with "?" mark this field as optional
 
@@ -68,7 +68,7 @@ tips: with "?" mark this field as optional
 | visible?           | boolean                            | show and hide                                                                                                                                                                                  |
 | zIndex?            | number                             | drawing order; default: 0                                                                                                                                                                      |
 
-#### methods:
+## methods:
 
 | name                   | argument                       | describe                                                                                                   |
 | ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
@@ -80,9 +80,9 @@ tips: with "?" mark this field as optional
 | getElementsByClassName | class string                   | returns the nodes or null                                                                                  |
 | attr                   | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
 
-### Label
+# Label
 
-#### attributes
+## attributes
 
 tips: with "?" mark this field as optional
 
@@ -98,16 +98,16 @@ tips: with "?" mark this field as optional
 | textAlign?      | "left" or "center" or "right" |          |
 | underLine?      | color string                  |          |
 
-#### methods
+## methods
 
 | name | argument | describe |
 | getElementById | id string | returns the node or null |
 | getElementsByClassName | class string | returns the nodes or null |
 | attr | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
 
-### Input
+# Input
 
-#### attributes
+## attributes
 
 tips: with "?" mark this field as optional
 
@@ -138,7 +138,7 @@ tips: with "?" mark this field as optional
 | visible?           | boolean                            | show and hide                                                                                                                                                                                  |
 | zIndex?            | number                             | drawing order; default: 0                                                                                                                                                                      |
 
-#### methods:
+## methods:
 
 | name                   | argument                       | describe                                                                                                   |
 | ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
@@ -148,9 +148,9 @@ tips: with "?" mark this field as optional
 | getElementsByClassName | class string                   | returns the nodes or null                                                                                  |
 | attr                   | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
 
-### Scrollbox
+# Scrollbox
 
-#### attributes
+## attributes
 
 tips: with "?" mark this field as optional
 
@@ -158,7 +158,6 @@ tips: with "?" mark this field as optional
 | ------------- | ------ | ------------------- |
 | contentWidth  | number | content area width  |
 | contentHeight | number | content area height |
-
 | placeholder? | string | |
 | value? | string | |
 | id? | string | id selector, the only one in the document |
@@ -184,7 +183,7 @@ tips: with "?" mark this field as optional
 | visible? | boolean | show and hide |
 | zIndex? | number | drawing order; default: 0 |
 
-#### methods:
+## methods:
 
 | name                   | argument                       | describe                                                                                                   |
 | ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
