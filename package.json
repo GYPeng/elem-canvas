@@ -25,7 +25,8 @@
   "keywords": [
     "el-canvas",
     "canvas",
-    "render"
+    "render",
+    "element"
   ],
   "author": "Alex",
   "license": "MIT License",

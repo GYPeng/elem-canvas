@@ -2,6 +2,7 @@ import Sprite from "./sprite";
 import LoadManage from "./loadManage";
 import Label from "./label";
 import { ratio } from "./config";
+import { EventType} from '../types/el-canvas'
 
 class Root extends Sprite {
   ctx: any;
@@ -10,7 +11,7 @@ class Root extends Sprite {
   target: HTMLElement;
   eventX: number | null;
   eventY: number | null;
-  eventType: "touchstart" | "touchmove" | "touchend" | "touchcancel";
+  eventType: EventType;
   eventObj: TouchEvent | null;
   eventConsed = true;
   ghostCanvas: HTMLCanvasElement;
