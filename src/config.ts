@@ -1,1 +1,1 @@
-export const ratio = 2;
+export const ratio = 1;
