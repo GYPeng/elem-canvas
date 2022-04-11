@@ -3,15 +3,7 @@ import LoadManage from "./loadManage";
 import Label from "./label";
 import { ratio } from "./config";
 import { EventType } from "../types/el-canvas";
-const mouseEvent = [
-  "mousedown",
-  "mouseenter",
-  "mouseup",
-  "mouseleave",
-  "mouseout",
-  "mouseover",
-  "mousemove",
-];
+const mouseEvent = ["mousedown", "mouseup", "mousemove"];
 
 class Root extends Sprite {
   ctx: any;
@@ -434,7 +426,7 @@ class Root extends Sprite {
     }`;
     this.currentEventColor = result;
   }
-  eventResolve(argv): boolean {
+  eventResolve(sprite): boolean {
     if (this.eventX && this.eventY) {
       const imageData = this.ghostCtx.getImageData(
         this.eventX,
@@ -454,14 +446,34 @@ class Root extends Sprite {
         b > 15 ? xB : "0" + xB
       }`;
 
-      if (argv.eventColor === result) {
-        const handlers = argv._eventMap[this.eventType];
-        if (argv._eventMap[this.eventType]) {
+      if (sprite.eventColor === result) {
+        const handlers = sprite._eventMap[this.eventType];
+        if (sprite._eventMap[this.eventType]) {
           for (let j = 0; j < handlers.length; j++) {
-            handlers[j].call(argv, this.eventObj);
+            handlers[j].call(sprite, this.eventObj);
           }
         }
+        // 鼠标未在元素区域内
+        if (!sprite.isEnter) {
+          const handlers = sprite._eventMap["mouseover"];
+          if (sprite._eventMap["mouseover"]) {
+            for (let j = 0; j < handlers.length; j++) {
+              handlers[j].call(sprite, this.eventObj);
+            }
+          }
+          sprite.isEnter = true;
+        }
         return true;
+      } else {
+        if (sprite.isEnter) {
+          const handlers = sprite._eventMap["mouseout"];
+          if (sprite._eventMap["mouseout"]) {
+            for (let j = 0; j < handlers.length; j++) {
+              handlers[j].call(sprite, this.eventObj);
+            }
+          }
+          sprite.isEnter = false;
+        }
       }
     }
     return false;
