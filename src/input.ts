@@ -13,7 +13,7 @@ class Input extends Sprite {
   borderTopColor: string = "#333";
   borderTopWidth: number = 2;
   value: string = "";
-  placeholder: string = '';
+  placeholder: string = "";
   label: Label;
   constructor(argv: any) {
     super(argv);
@@ -26,8 +26,8 @@ class Input extends Sprite {
     // this.bold = argv.bold === undefined ? false : argv.bold;
     // this.textAlign = argv.textAlign || "center";
     // this.underLine = argv.underLine === undefined ? null : argv.underLine;
-    this.value = argv.value || ''
-    this.placeholder = argv.placeholder || ''
+    this.value = argv.value || "";
+    this.placeholder = argv.placeholder || "";
 
     this.label = new Label({
       text: this.value || this.placeholder,
@@ -56,8 +56,10 @@ class Input extends Sprite {
       }
 
       input.value = this.value;
-      input.style.left = this.pageX / 2 + "px";
-      input.style.top = this.pageY / 2 + "px";
+      input.style.left =
+        this.pageX / 2 + this.root.target.getBoundingClientRect().x + "px";
+      input.style.top =
+        this.pageY / 2 + this.root.target.getBoundingClientRect().y + "px";
       input.style.display = "block";
       input.style.width = `${this.width / 2}px`;
       input.style.height = `${this.height / 2}px`;
