@@ -69,6 +69,8 @@ class Input extends Sprite {
       input.focus();
     });
   }
+  append(child: any): void {}
+  remove(child: any): void {}
 }
 
 export default Input;

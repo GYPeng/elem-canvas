@@ -46,6 +46,8 @@ class Label extends Sprite {
     this[attrName] = value;
     this.parent["canvas"] = undefined;
   }
+  append(child: any): void {}
+  remove(child: any): void {}
 }
 
 export default Label;
