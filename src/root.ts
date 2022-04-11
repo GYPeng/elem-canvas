@@ -2,8 +2,16 @@ import Sprite from "./sprite";
 import LoadManage from "./loadManage";
 import Label from "./label";
 import { ratio } from "./config";
-import { EventType} from '../types/el-canvas'
-const mouseEvent = ['mousedown']
+import { EventType } from "../types/el-canvas";
+const mouseEvent = [
+  "mousedown",
+  "mouseenter",
+  "mouseup",
+  "mouseleave",
+  "mouseout",
+  "mouseover",
+  "mousemove",
+];
 
 class Root extends Sprite {
   ctx: any;
@@ -51,31 +59,37 @@ class Root extends Sprite {
     this.ghostCanvas.style.width = "100%";
     this.target.append(this.canvas);
 
-    mouseEvent.forEach((eventname: EventType)=> {
-      this.canvas.addEventListener(eventname, (event: MouseEvent) => {
-        if (!this.eventConsed) {
-          return;
-        }
-        this.eventConsed = false;
-        event.preventDefault();
-        const input = document.getElementById("input-dom") as HTMLInputElement;
-        if (input) {
-          input.blur();
-        }
-        const { pageX, pageY } = event
-        this.eventType = eventname;
-        this.eventX = pageX * ratio;
-        this.eventY = pageY * ratio;
-        this.eventObj = event;
-
-        const handlers = this._eventMap[eventname];
-        if (this._eventMap[eventname]) {
-          for (let j = 0; j < handlers.length; j++) {
-            handlers[j].call(this, event);
+    mouseEvent.forEach((eventname: EventType) => {
+      this.canvas.addEventListener(
+        eventname,
+        (event: MouseEvent) => {
+          if (!this.eventConsed) {
+            return;
           }
-        }
-      }, false)
-    })
+          this.eventConsed = false;
+          event.preventDefault();
+          const input = document.getElementById(
+            "input-dom"
+          ) as HTMLInputElement;
+          if (input) {
+            input.blur();
+          }
+          const { pageX, pageY } = event;
+          this.eventType = eventname;
+          this.eventX = (pageX - this.target.getBoundingClientRect().x) * ratio;
+          this.eventY = (pageY - this.target.getBoundingClientRect().y) * ratio;
+          this.eventObj = event;
+
+          const handlers = this._eventMap[eventname];
+          if (this._eventMap[eventname]) {
+            for (let j = 0; j < handlers.length; j++) {
+              handlers[j].call(this, event);
+            }
+          }
+        },
+        false
+      );
+    });
 
     this.canvas.addEventListener(
       "touchstart",
@@ -92,8 +106,8 @@ class Root extends Sprite {
         const { targetTouches } = event;
         const { pageX, pageY } = targetTouches[0];
         this.eventType = "touchstart";
-        this.eventX = pageX * ratio;
-        this.eventY = pageY * ratio;
+        this.eventX = (pageX - this.target.getBoundingClientRect().x) * ratio;
+        this.eventY = (pageY - this.target.getBoundingClientRect().y) * ratio;
         this.eventObj = event;
 
         const handlers = this._eventMap["touchstart"];
@@ -117,8 +131,8 @@ class Root extends Sprite {
         const { targetTouches } = event;
         const { pageX, pageY } = targetTouches[0];
         this.eventType = "touchmove";
-        this.eventX = pageX * ratio;
-        this.eventY = pageY * ratio;
+        this.eventX = (pageX - this.target.getBoundingClientRect().x) * ratio;
+        this.eventY = (pageY - this.target.getBoundingClientRect().y) * ratio;
         this.eventObj = event;
 
         const handlers = this._eventMap["touchmove"];
@@ -229,14 +243,6 @@ class Root extends Sprite {
       let clipWidth, clipX, clipHeight, clipY;
       if (parentOverflowX === "hidden") {
         if (overflowX === "hidden") {
-          // if (id === "test1") {
-          //   console.log(
-          //     x + width,
-          //     parent.viewArea.clipX,
-          //     x,
-          //     parent.viewArea.clipX + parent.viewArea.clipWidth
-          //   );
-          // }
           if (
             x + width < parent.viewArea.clipX ||
             x > parent.viewArea.clipX + parent.viewArea.clipWidth
@@ -252,7 +258,8 @@ class Root extends Sprite {
               ) {
                 clipWidth = width;
               } else {
-                clipWidth = parent.viewArea.clipWidth;
+                clipWidth =
+                  parent.viewArea.clipWidth + parent.viewArea.clipX - clipX;
               }
             } else {
               clipX = parent.viewArea.clipX;
@@ -302,7 +309,8 @@ class Root extends Sprite {
               ) {
                 clipHeight = height;
               } else {
-                clipHeight = parent.viewArea.clipHeight;
+                clipHeight =
+                  parent.viewArea.clipHeight + parent.viewArea.clipY - clipY;
               }
             } else {
               clipY = parent.viewArea.clipY;
