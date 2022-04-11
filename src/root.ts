@@ -446,7 +446,15 @@ class Root extends Sprite {
         b > 15 ? xB : "0" + xB
       }`;
 
-      if (sprite.eventColor === result) {
+      const { clipX, clipY, clipWidth, clipHeight } = sprite.parent.viewArea;
+
+      if (
+        sprite.eventColor === result &&
+        this.eventX > clipX &&
+        this.eventX < clipX + clipWidth &&
+        this.eventY > clipY &&
+        this.eventY < clipY + clipHeight
+      ) {
         const handlers = sprite._eventMap[this.eventType];
         if (sprite._eventMap[this.eventType]) {
           for (let j = 0; j < handlers.length; j++) {
