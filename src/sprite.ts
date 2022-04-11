@@ -1,6 +1,7 @@
 import LoadManage from "./loadManage";
 import Label from "./label";
 import { ratio } from "./config";
+import { comType } from "./utils";
 
 interface EventMapTypes {
   touchstart: Function[];
@@ -219,9 +220,18 @@ class Sprite implements SpriteTypes {
       return null;
     }
   }
-  attr(attrName: string, value: any) {
-    this[attrName] = value;
-    this["canvas"] = undefined;
+  attr(firstArg: string | object, value: any) {
+    if (firstArg) {
+      if (comType(firstArg, "string")) {
+        this[firstArg as string] = value;
+      } else if (comType(firstArg, "object")) {
+        for (let i in firstArg as object) {
+          this[i] = firstArg[i];
+        }
+      }
+      // 清空渲染缓存
+      this["canvas"] = undefined;
+    }
   }
 }
 

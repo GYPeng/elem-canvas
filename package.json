@@ -1,6 +1,6 @@
 {
   "name": "elem-canvas",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Canvas rendering library, Sprite manipulation of canvas",
   "main": "dist/index.js",
   "scripts": {
