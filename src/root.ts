@@ -3,16 +3,16 @@ import LoadManage from "./loadManage";
 import Label from "./label";
 import { ratio } from "./config";
 import { EventType} from '../types/el-canvas'
+const mouseEvent = ['mousedown']
 
 class Root extends Sprite {
   ctx: any;
-  // ctx: CanvasRenderingContext2D;
   canvas: HTMLCanvasElement;
   target: HTMLElement;
   eventX: number | null;
   eventY: number | null;
   eventType: EventType;
-  eventObj: TouchEvent | null;
+  eventObj: MouseEvent | TouchEvent | null;
   eventConsed = true;
   ghostCanvas: HTMLCanvasElement;
   ghostCtx: any;
@@ -50,7 +50,32 @@ class Root extends Sprite {
     this.ghostCanvas.style.height = "100%";
     this.ghostCanvas.style.width = "100%";
     this.target.append(this.canvas);
-    // this.target.append(this.ghostCanvas);
+
+    mouseEvent.forEach((eventname: EventType)=> {
+      this.canvas.addEventListener(eventname, (event: MouseEvent) => {
+        if (!this.eventConsed) {
+          return;
+        }
+        this.eventConsed = false;
+        event.preventDefault();
+        const input = document.getElementById("input-dom") as HTMLInputElement;
+        if (input) {
+          input.blur();
+        }
+        const { pageX, pageY } = event
+        this.eventType = eventname;
+        this.eventX = pageX * ratio;
+        this.eventY = pageY * ratio;
+        this.eventObj = event;
+
+        const handlers = this._eventMap[eventname];
+        if (this._eventMap[eventname]) {
+          for (let j = 0; j < handlers.length; j++) {
+            handlers[j].call(this, event);
+          }
+        }
+      }, false)
+    })
 
     this.canvas.addEventListener(
       "touchstart",
@@ -520,25 +545,6 @@ class Root extends Sprite {
           } else if (textAlign === "right") {
             drawX += width - drawW;
           }
-
-          // 多行文本，超出屏幕区域的部分，跳过渲染
-          // if (drawX > this.width || drawX + w < 0) {
-          //   // 横向超出屏幕
-          //   tmp = "";
-          //   totalY += lineHeight;
-          //   continue;
-          // } else if (
-          //   y + totalY + (lineHeight - fontSize) / 2 + lineHeight <
-          //   0
-          // ) {
-          //   // 纵向，超出屏幕顶部
-          //   tmp = "";
-          //   totalY += lineHeight;
-          //   continue;
-          // } else if (y + totalY + (lineHeight - fontSize) / 2 > this.height) {
-          //   // 纵向，超出屏幕底部
-          //   return;
-          // }
 
           if (stroke) {
             ctx.strokeText(
