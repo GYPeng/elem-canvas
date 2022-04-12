@@ -1,13 +1,13 @@
 # el-canvas
 
-<img width="100px" align="middle" src="https://raw.githubusercontent.com/GYPeng/elem-canvas/a8127bfc15e5445fbe8678ff72608dfb8b96a3dc/logo.svg"/>
+[<img width="100px" align="middle" src="https://raw.githubusercontent.com/GYPeng/elem-canvas/a8127bfc15e5445fbe8678ff72608dfb8b96a3dc/logo.svg"/>]()
 
 Canvas rendering library, Sprite manipulation of canvas
 
 ## hello world
 
 ```html
-<div id="app"><div></div></div>
+<div id="app"></div>
 ```
 
 ```
