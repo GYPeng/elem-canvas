@@ -90,15 +90,15 @@ tips: with "?" mark this field as optional
 
 ## methods:
 
-| name                   | argument                       | describe                                                                                                   |
-| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| on                     | (eventname, callback)          | binding event; callback arguments: (this, event)                                                           |
-| off                    | (eventname, callback)          | unbinding event                                                                                            |
-| append                 | node                           | insert child node                                                                                          |
-| remove                 | node                           | remove child node                                                                                          |
-| getElementById         | id string                      | returns the node or null                                                                                   |
-| getElementsByClassName | class string                   | returns the nodes or null                                                                                  |
-| attr                   | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
+| name                   | argument                                      | describe                                                                                                   |
+| ---------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| on                     | (eventname: string, callback: Function)       | binding event; callback arguments: (this, event)                                                           |
+| off                    | (eventname: string, callback: Function)       | unbinding event                                                                                            |
+| append                 | (node: Sprite \| Input \| Scrollbox \| Label) | insert child node                                                                                          |
+| remove                 | (node: Sprite \| Input \| Scrollbox \| Label) | remove child node                                                                                          |
+| getElementById         | (id: string)                                  | returns the node or null                                                                                   |
+| getElementsByClassName | (class: string)                               | returns the nodes or null                                                                                  |
+| attr                   | (firstArgv: string \| object, value?: any)    | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
 
 # Label
 
@@ -120,11 +120,11 @@ tips: with "?" mark this field as optional
 
 ## methods
 
-| name                   | argument                       | describe                                                                                                   |
-| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| getElementById         | id string                      | returns the node or null                                                                                   |
-| getElementsByClassName | class string                   | returns the nodes or null                                                                                  |
-| attr                   | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
+| name                   | argument                                   | describe                                                                                                   |
+| ---------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| getElementById         | (id: string)                               | returns the node or null                                                                                   |
+| getElementsByClassName | (class: string)                            | returns the nodes or null                                                                                  |
+| attr                   | (firstArgv: string \| object, value?: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
 
 # Input
 
@@ -161,13 +161,13 @@ tips: with "?" mark this field as optional
 
 ## methods:
 
-| name                   | argument                       | describe                                                                                                   |
-| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| on                     | (eventname, callback)          | binding event; callback arguments: (this, event)                                                           |
-| off                    | (eventname, callback)          | unbinding event                                                                                            |
-| getElementById         | id string                      | returns the node or null                                                                                   |
-| getElementsByClassName | class string                   | returns the nodes or null                                                                                  |
-| attr                   | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
+| name                   | argument                                   | describe                                                                                                   |
+| ---------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| on                     | (eventname: string, callback: Function)    | binding event; callback arguments: (this, event)                                                           |
+| off                    | (eventname: string, callback: Function)    | unbinding event                                                                                            |
+| getElementById         | (id: string)                               | returns the node or null                                                                                   |
+| getElementsByClassName | (class: string)                            | returns the nodes or null                                                                                  |
+| attr                   | (firstArgv: string \| object, value?: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
 
 # Scrollbox
 
@@ -204,12 +204,12 @@ tips: with "?" mark this field as optional
 
 ## methods:
 
-| name                   | argument                       | describe                                                                                                   |
-| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| on                     | (eventname, callback)          | binding event; callback arguments: (this, event)                                                           |
-| off                    | (eventname, callback)          | unbinding event                                                                                            |
-| append                 | node                           | insert child node                                                                                          |
-| remove                 | node                           | remove child node                                                                                          |
-| getElementById         | id string                      | returns the node or null                                                                                   |
-| getElementsByClassName | class string                   | returns the nodes or null                                                                                  |
-| attr                   | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
+| name                   | argument                                      | describe                                                                                                   |
+| ---------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| on                     | (eventname: string, callback: Function)       | binding event; callback arguments: (this, event)                                                           |
+| off                    | (eventname: string, callback: Function)       | unbinding event                                                                                            |
+| append                 | (node: Sprite \| Label \| Input \| Scrollbox) | insert child node                                                                                          |
+| remove                 | (node: Sprite \| Label \| Input \| Scrollbox) | remove child node                                                                                          |
+| getElementById         | (id: string)                                  | returns the node or null                                                                                   |
+| getElementsByClassName | (class: string)                               | returns the nodes or null                                                                                  |
+| attr                   | (firstArgv: string \| object, value: any)     | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
