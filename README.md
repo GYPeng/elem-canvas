@@ -1,8 +1,6 @@
 # el-canvas
 
-<center>
-  <img width="100px" src="https://raw.githubusercontent.com/GYPeng/elem-canvas/a8127bfc15e5445fbe8678ff72608dfb8b96a3dc/logo.svg"/>
-</center>
+<img width="100px" align="middle" src="https://raw.githubusercontent.com/GYPeng/elem-canvas/a8127bfc15e5445fbe8678ff72608dfb8b96a3dc/logo.svg"/>
 
 Canvas rendering library, Sprite manipulation of canvas
 
@@ -181,8 +179,6 @@ tips: with "?" mark this field as optional
 | ------------------ | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | contentWidth       | number                             | content area width                                                                                                                                                                             |
 | contentHeight      | number                             | content area height                                                                                                                                                                            |
-| placeholder?       | string                             |                                                                                                                                                                                                |
-| value?             | string                             |                                                                                                                                                                                                |
 | id?                | string                             | id selector, the only one in the document                                                                                                                                                      |
 | x?                 | number                             | In absolute layout, x is the X-axis offset relative to the upper left corner of the parent node. In a fixed layout, x is the X-axis offset relative to the upper-left corner of the Root node. |
 | y?                 | number                             | with x 👆                                                                                                                                                                                      |
