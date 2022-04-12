@@ -535,8 +535,8 @@ class Root extends Sprite {
     }
 
     ctx.fillStyle = color || "#000";
-    // 单行文本不需要计算超出屏幕部分
-    if (textWidth <= width) {
+    // 单行文本不需要计算超出屏幕部分 并增加对换行符的判断
+    if (!/\n/g.test(text) && textWidth <= width) {
       if (textAlign === "center") {
         x += (width - textWidth) / 2;
       } else if ((textAlign = "left")) {
@@ -565,7 +565,10 @@ class Root extends Sprite {
       while (arr.length || tmp) {
         const letter = arr[0];
         const w = ctx.measureText(tmp + letter).width;
-        if (w > width || !arr.length) {
+        if (letter === "\n" || w > width || !arr.length) {
+          if (letter === "\n") {
+            arr.shift();
+          }
           const drawW = ctx.measureText(tmp).width;
           let drawX = x;
           if (textAlign === "center") {
