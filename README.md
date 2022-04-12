@@ -1,5 +1,9 @@
 # el-canvas
 
+<div style="text-align: center">
+  <img width="100px" src="data:image/svg+xml;base64,PHN2ZyBpZD0i5Zu+5bGCXzEiIGRhdGEtbmFtZT0i5Zu+5bGCIDEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQwMCA0MDAiPjxkZWZzPjxzdHlsZT4uY2xzLTF7ZmlsbDojMDBjZmNkO30uY2xzLTJ7ZmlsbDojMDA5Yjk5O30uY2xzLTN7ZmlsbDojMDA2ODY3O30uY2xzLTR7ZmlsbDojMDBiOWFlO30uY2xzLTV7ZmlsbDojMDA4NDdmO308L3N0eWxlPjwvZGVmcz48cmVjdCBjbGFzcz0iY2xzLTEiIHg9IjM0LjY4IiB5PSIzNSIgd2lkdGg9IjExMC4wMyIgaGVpZ2h0PSIxMTAuMDMiLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMTQ0LjcxIDM1IDE0NC43MSAxNDUuMDMgMzQuNjggMTQ1LjAzIDM0LjY4IDI1NS4wNSAxNDQuNzEgMjU1LjA1IDI1NC43MyAyNTUuMDUgMjU0LjczIDM1IDE0NC43MSAzNSIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMyIgcG9pbnRzPSIyNTQuNzMgMzUgMjU0LjczIDI1NS4wNSAzNC42OCAyNTUuMDUgMzQuNjggMzY1LjA4IDM2NC43NiAzNjUuMDggMzY0Ljc2IDI1NS4wNSAzNjQuNzYgMzUgMjU0LjczIDM1Ii8+PHBvbHlnb24gY2xhc3M9ImNscy00IiBwb2ludHM9IjE0NC43MSAzNSAxNDQuNzEgMTQ1LjAzIDI1NC43MyAyNTUuMDUgMjU0LjczIDM1IDE0NC43MSAzNSIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtNSIgcG9pbnRzPSIzNjQuNzYgMzY1LjA4IDI1NC43MyAyNTUuMDUgMjU0LjczIDM1IDM2NC43NiAzNSAzNjQuNzYgMzY1LjA4Ii8+PC9zdmc+"/>
+</div>
+
 Canvas rendering library, Sprite manipulation of canvas
 
 ## hello world
@@ -100,11 +104,11 @@ tips: with "?" mark this field as optional
 
 ## methods
 
-| name | argument | describe |
-|--|--|--|
-| getElementById | id string | returns the node or null |
-| getElementsByClassName | class string | returns the nodes or null |
-| attr | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
+| name                   | argument                       | describe                                                                                                   |
+| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| getElementById         | id string                      | returns the node or null                                                                                   |
+| getElementsByClassName | class string                   | returns the nodes or null                                                                                  |
+| attr                   | (attrName: string, value: any) | Modify the attribute value. If properties are not modified using this method, rendering may not be updated |
 
 # Input
 
@@ -155,34 +159,34 @@ tips: with "?" mark this field as optional
 
 tips: with "?" mark this field as optional
 
-| name          | value  | describe            |
-| ------------- | ------ | ------------------- |
-| contentWidth  | number | content area width  |
-| contentHeight | number | content area height |
-| placeholder? | string | |
-| value? | string | |
-| id? | string | id selector, the only one in the document |
-| x? | number | In absolute layout, x is the X-axis offset relative to the upper left corner of the parent node. In a fixed layout, x is the X-axis offset relative to the upper-left corner of the Root node. |
-| y? | number | with x 👆 |
-| width | number | |
-| height | number | |
-| bgColor? | color string | either bgImage or bgColor |
-| bgImage? | image url | either bgImage or bgColor, note the CROS |
-| overflowY? | hidden or visible | default: hidden |
-| overflowX? | hidden or visible | default: hidden |
-| children? | Array<Sprite \| Label \| Function> | child nodes |
-| borderLeftColor? | color string | |
-| borderLeftWidth? | number | |
-| borderTopColor? | color string | |
-| borderTopWidth? | number | |
-| borderRightColor? | color string | |
-| borderRightWidth? | number | |
-| borderBottomColor? | color string | |
-| borderBottomWidth? | number | |
-| className? | string or string[] | class selector |
-| position? | absolute or fixed | absolute: positioning relative to the parent; fixed: location relative to Root |
-| visible? | boolean | show and hide |
-| zIndex? | number | drawing order; default: 0 |
+| name               | value                              | describe                                                                                                                                                                                       |
+| ------------------ | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| contentWidth       | number                             | content area width                                                                                                                                                                             |
+| contentHeight      | number                             | content area height                                                                                                                                                                            |
+| placeholder?       | string                             |                                                                                                                                                                                                |
+| value?             | string                             |                                                                                                                                                                                                |
+| id?                | string                             | id selector, the only one in the document                                                                                                                                                      |
+| x?                 | number                             | In absolute layout, x is the X-axis offset relative to the upper left corner of the parent node. In a fixed layout, x is the X-axis offset relative to the upper-left corner of the Root node. |
+| y?                 | number                             | with x 👆                                                                                                                                                                                      |
+| width              | number                             |                                                                                                                                                                                                |
+| height             | number                             |                                                                                                                                                                                                |
+| bgColor?           | color string                       | either bgImage or bgColor                                                                                                                                                                      |
+| bgImage?           | image url                          | either bgImage or bgColor, note the CROS                                                                                                                                                       |
+| overflowY?         | hidden or visible                  | default: hidden                                                                                                                                                                                |
+| overflowX?         | hidden or visible                  | default: hidden                                                                                                                                                                                |
+| children?          | Array<Sprite \| Label \| Function> | child nodes                                                                                                                                                                                    |
+| borderLeftColor?   | color string                       |                                                                                                                                                                                                |
+| borderLeftWidth?   | number                             |                                                                                                                                                                                                |
+| borderTopColor?    | color string                       |                                                                                                                                                                                                |
+| borderTopWidth?    | number                             |                                                                                                                                                                                                |
+| borderRightColor?  | color string                       |                                                                                                                                                                                                |
+| borderRightWidth?  | number                             |                                                                                                                                                                                                |
+| borderBottomColor? | color string                       |                                                                                                                                                                                                |
+| borderBottomWidth? | number                             |                                                                                                                                                                                                |
+| className?         | string or string[]                 | class selector                                                                                                                                                                                 |
+| position?          | absolute or fixed                  | absolute: positioning relative to the parent; fixed: location relative to Root                                                                                                                 |
+| visible?           | boolean                            | show and hide                                                                                                                                                                                  |
+| zIndex?            | number                             | drawing order; default: 0                                                                                                                                                                      |
 
 ## methods:
 
