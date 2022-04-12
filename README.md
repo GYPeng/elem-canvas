@@ -1,8 +1,8 @@
 # el-canvas
 
-<div style="text-align: center">
+<center>
   <img width="100px" src="https://raw.githubusercontent.com/GYPeng/elem-canvas/a8127bfc15e5445fbe8678ff72608dfb8b96a3dc/logo.svg"/>
-</div>
+</center>
 
 Canvas rendering library, Sprite manipulation of canvas
 
@@ -25,13 +25,31 @@ import { Root, Sprite } from "elem-canvas";
 
 const app = new Root(document.getElementById("app"));
 
-const ves = new Sprite({
-  width: window.innerWidth,
-  height: window.innerHeight,
-  bgColor: "red",
+const root = new Sprite({
+  x: (window.innerWidth - 300) / 2,
+  y: (window.innerHeight - 300) / 2,
+  width: 300,
+  height: 300,
+  borderRightWidth: 100,
+  borderRightColor: "#008480",
+  borderBottomWidth: 100,
+  borderBottomColor: "#006868",
+  children: new Sprite({
+    width: 200,
+    height: 200,
+    borderRightWidth: 100,
+    borderRightColor: "#00baaf",
+    borderBottomWidth: 100,
+    borderBottomColor: "#009b9a",
+    children: new Sprite({
+      width: 100,
+      height: 100,
+      bgColor: "#00cfcd",
+    }),
+  }),
 });
 
-app.append(ves);
+app.append(root);
 ```
 
 # nodes
