@@ -183,6 +183,7 @@ class Root extends Sprite {
     this.canvas.addEventListener(
       "wheel",
       (event: TouchEvent) => {
+        event.preventDefault();
         const handlers = this._eventMap["wheel"];
         if (this._eventMap["wheel"]) {
           for (let j = 0; j < handlers.length; j++) {
