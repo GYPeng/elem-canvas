@@ -82,7 +82,7 @@ class Sprite implements SpriteTypes {
   pageX = 0;
   pageY = 0;
   parent: SpriteTypes;
-  children: Sprite[] | Label[] = [];
+  children: Array<Sprite | Label> = [];
   width: number;
   height: number;
   position: "absolute" | "fixed";

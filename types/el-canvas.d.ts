@@ -8,5 +8,5 @@ export type EventType =
   | "mouseout"
   | "mouseup"
   | "keydown"
-  | "keyup";
-
+  | "keyup"
+  | "wheel";

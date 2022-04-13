@@ -1,4 +1,4 @@
-import { ratio } from "./config";
+import { ratio, platform } from "./config";
 import Sprite from "./sprite";
 import TWEEN, { Tween } from "@tweenjs/tween.js";
 
@@ -6,6 +6,12 @@ class ScrollBox extends Sprite {
   contentWidth: number;
   contentHeight: number;
   contentVes: Sprite;
+  scrollbarXWidth = platform === "pc" ? 10 : 0;
+  scrollbarX: Sprite;
+  scrollbarXSlide: Sprite;
+  scrollbarY: Sprite;
+  scrollbarYSlide: Sprite;
+  _append: Function;
   constructor(argv: any) {
     super(argv);
     const _this = this;
@@ -19,6 +25,7 @@ class ScrollBox extends Sprite {
       width: this.contentWidth,
       height: this.contentHeight,
     });
+
     this.contentVes = ves;
     ves.name = "scrollbar_ves";
     if (this.children) {
@@ -29,6 +36,16 @@ class ScrollBox extends Sprite {
       }
     }
     this.append(ves);
+
+    this._append = this.append;
+    /**
+     * 滚动条
+     */
+    this.addScrollbarY();
+    /**
+     * 滚动条
+     */
+    this.append = ves.append;
     let startX, startY, moveX, moveY;
     let beginX, beginY;
     let startms;
@@ -120,6 +137,35 @@ class ScrollBox extends Sprite {
       }
     }
   }
+  addScrollbarY() {
+    if (platform === "pc") {
+      const scrollbarY = new Sprite({
+        width: 10,
+        height: this.height,
+        bgColor: "rgba(0,0,0,0.1)",
+        x: this.width / ratio - 10,
+        zIndex: 99999,
+      });
+      const scrollbarYSlide = new Sprite({
+        width: 10,
+        height: Math.max(
+          ((this.height / this.contentHeight) * this.height) / ratio,
+          100
+        ),
+        bgColor: "rgba(0,0,0,0.4)",
+      });
+
+      const mousedown = function () {};
+
+      scrollbarYSlide.on("mousedown", mousedown);
+
+      scrollbarY.append(scrollbarYSlide);
+      this._append(scrollbarY);
+
+      this.scrollbarY = scrollbarY;
+      this.scrollbarYSlide = scrollbarYSlide;
+    }
+  }
   wheel(x, y) {
     const ves = this.contentVes;
     if (x > 0 || this.contentWidth < this.width) {
@@ -137,6 +183,10 @@ class ScrollBox extends Sprite {
     } else {
       ves.y = y;
     }
+
+    this.scrollbarYSlide.y =
+      -(this.height - this.scrollbarYSlide.height) *
+      (ves.y / (this.contentHeight - this.height));
   }
   frame(now: any): void {
     if (this._tween.length) {
