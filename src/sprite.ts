@@ -42,6 +42,8 @@ interface SpriteTypes {
   borderBottomWidth: number;
   className: string[];
   visible: boolean;
+  frame: Function;
+  _tween: any[];
 }
 export interface SpriteInitTypes {
   id?: string;
@@ -98,6 +100,7 @@ class Sprite implements SpriteTypes {
   borderBottomColor: string;
   borderBottomWidth: number;
   visible: boolean;
+  _tween: any[] = [];
   get root() {
     if (!this.parent) {
       return this;
@@ -220,7 +223,7 @@ class Sprite implements SpriteTypes {
       return null;
     }
   }
-  attr(firstArg: string | object, value: any) {
+  attr(firstArg: string | object, value?: any) {
     if (firstArg) {
       if (comType(firstArg, "string")) {
         this[firstArg as string] = value;
@@ -233,6 +236,7 @@ class Sprite implements SpriteTypes {
       this["canvas"] = undefined;
     }
   }
+  frame(now) {}
 }
 
 export default Sprite;
