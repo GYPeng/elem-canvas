@@ -1,4 +1,4 @@
-import { ratio, platform } from "./config";
+import { ratio, platform, isMac } from "./config";
 import Sprite from "./sprite";
 import TWEEN, { Tween } from "@tweenjs/tween.js";
 
@@ -119,9 +119,41 @@ class ScrollBox extends Sprite {
       }
     });
 
+    let wheelDisX, wheelDisY, wheelLastX, wheelLastY;
+
     this.on("wheel", function (ev) {
-      const tmpX = ves.x - ev.deltaX;
-      const tmpY = ves.y - ev.deltaY;
+      const tmpX = ves.x - ev.deltaX * (isMac ? 1 : 2);
+      const tmpY = ves.y - ev.deltaY * (isMac ? 1 : 2);
+
+      wheelDisX = wheelLastX - tmpX;
+      wheelDisY = wheelLastY - tmpY;
+      wheelLastX = tmpX;
+      wheelLastY = tmpY;
+
+      if (Date.now() - startms < 500) {
+        const to = { x: ves.x, y: ves.y };
+        if (Math.abs(disY) > 30) {
+          to.y = ves.y - disY * 10;
+        }
+        if (Math.abs(disX) > 30) {
+          to.x = ves.x - disX * 10;
+        }
+
+        this.stopInertia();
+
+        this._tween.push({
+          name: "inertia",
+          coords: {
+            x: ves.x,
+            y: ves.y,
+          },
+          interval: 500,
+          to,
+          callback: (coords) => {
+            this.wheel(coords.x, coords.y);
+          },
+        });
+      }
 
       _this.wheel(tmpX, tmpY);
     });
