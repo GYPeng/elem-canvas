@@ -13,6 +13,4 @@ export const getPlatform = function () {
   }
 };
 
-export const platform = getPlatform();
-
-export const isMac = navigator.platform.indexOf("Mac") === 0;
+export const isMac = () => navigator.platform.indexOf("Mac") === 0;

@@ -19,6 +19,16 @@ class Root extends Sprite {
   ghostCtx: any;
   eventColorMap: any = [];
   currentEventColor: String = "#000000";
+  eventQueue = {
+    touchmove: [],
+    touchstart: [],
+    wheel: [],
+    mousedown: [],
+    mousemove: [],
+    mouseup: [],
+    mouseout: [],
+    mouseover: [],
+  };
 
   viewArea: any;
   constructor(el) {
@@ -72,6 +82,9 @@ class Root extends Sprite {
           this.eventX = (pageX - this.target.getBoundingClientRect().x) * ratio;
           this.eventY = (pageY - this.target.getBoundingClientRect().y) * ratio;
           this.eventObj = event;
+          this.eventObj["stopElemPropagation"] = () => {
+            this.eventObj["elemStop"] = true;
+          };
 
           const handlers = this._eventMap[eventname];
           if (this._eventMap[eventname]) {
@@ -102,6 +115,9 @@ class Root extends Sprite {
         this.eventX = (pageX - this.target.getBoundingClientRect().x) * ratio;
         this.eventY = (pageY - this.target.getBoundingClientRect().y) * ratio;
         this.eventObj = event;
+        this.eventObj["stopElemPropagation"] = () => {
+          this.eventObj["elemStop"] = true;
+        };
 
         const handlers = this._eventMap["touchstart"];
         if (this._eventMap["touchstart"]) {
@@ -126,6 +142,9 @@ class Root extends Sprite {
         this.eventX = (pageX - this.target.getBoundingClientRect().x) * ratio;
         this.eventY = (pageY - this.target.getBoundingClientRect().y) * ratio;
         this.eventObj = event;
+        this.eventObj["stopElemPropagation"] = () => {
+          this.eventObj["elemStop"] = true;
+        };
 
         const handlers = this._eventMap["wheel"];
         if (this._eventMap["wheel"]) {
@@ -151,6 +170,9 @@ class Root extends Sprite {
         this.eventX = (pageX - this.target.getBoundingClientRect().x) * ratio;
         this.eventY = (pageY - this.target.getBoundingClientRect().y) * ratio;
         this.eventObj = event;
+        this.eventObj["stopElemPropagation"] = () => {
+          this.eventObj["elemStop"] = true;
+        };
 
         const handlers = this._eventMap["touchmove"];
         if (this._eventMap["touchmove"]) {
@@ -165,6 +187,9 @@ class Root extends Sprite {
     this.canvas.addEventListener(
       "touchcancel",
       (event: TouchEvent) => {
+        event["stopElemPropagation"] = () => {
+          event["elemStop"] = true;
+        };
         const handlers = this._eventMap["touchcancel"];
         if (this._eventMap["touchcancel"]) {
           for (let j = 0; j < handlers.length; j++) {
@@ -186,6 +211,9 @@ class Root extends Sprite {
     this.canvas.addEventListener(
       "touchend",
       (event: TouchEvent) => {
+        event["stopElemPropagation"] = () => {
+          event["elemStop"] = true;
+        };
         const handlers = this._eventMap["touchend"];
         if (this._eventMap["touchend"]) {
           for (let j = 0; j < handlers.length; j++) {
@@ -210,11 +238,32 @@ class Root extends Sprite {
     this.currentEventColor = "#000001";
     this.eventColorMap = [];
     await this.deep(this.children);
+    this.triggerEventQueue();
     this.eventConsed = true;
     this.eventObj = null;
     this.eventX = null;
     this.eventY = null;
     requestAnimationFrame(this.frame.bind(this));
+  }
+
+  triggerEventQueue() {
+    for (let eventType in this.eventQueue) {
+      const queue = this.eventQueue[eventType];
+      for (let i = 0; i < queue.length; i++) {
+        const { handlers, trigger, event } = queue[i];
+        let isStop;
+        for (let j = 0; j < handlers?.length; j++) {
+          handlers[j].call(trigger, event);
+          if (event["elemStop"]) {
+            isStop = true;
+          }
+        }
+        if (isStop) {
+          break;
+        }
+      }
+      this.eventQueue[eventType] = [];
+    }
   }
 
   async deep(children) {
@@ -234,7 +283,6 @@ class Root extends Sprite {
         return;
       }
       if (Object.keys(item._eventMap).length) {
-        item.eventLock = false;
         item.eventColor = this.currentEventColor;
         this.eventColorMap.push({
           color: this.currentEventColor,
@@ -371,8 +419,8 @@ class Root extends Sprite {
       this.ghostCtx.fillRect(x, y, width, height);
       this.ghostCtx.restore();
       // 防止多次触发事件
-      if (item.eventLock === false && this.eventObj) {
-        item.eventLock = this.eventResolve(item);
+      if (this.eventObj) {
+        this.eventResolve(item);
       }
 
       if (name === "sprite" || name === "scrollbar_ves" || name === "input") {
@@ -480,30 +528,37 @@ class Root extends Sprite {
         this.eventY > clipY &&
         this.eventY < clipY + clipHeight
       ) {
-        const handlers = sprite._eventMap[this.eventType];
         if (sprite._eventMap[this.eventType]) {
-          for (let j = 0; j < handlers.length; j++) {
-            handlers[j].call(sprite, this.eventObj);
-          }
+          const handlers = sprite._eventMap[this.eventType];
+
+          this.eventQueue[this.eventType].unshift({
+            handlers,
+            event: this.eventObj,
+            trigger: sprite,
+          });
         }
         // 鼠标未在元素区域内
         if (!sprite.isEnter) {
           const handlers = sprite._eventMap["mouseover"];
           if (sprite._eventMap["mouseover"]) {
-            for (let j = 0; j < handlers.length; j++) {
-              handlers[j].call(sprite, this.eventObj);
-            }
+            this.eventQueue["mouseover"].unshift({
+              handlers,
+              event: this.eventObj,
+              trigger: sprite,
+            });
           }
           sprite.isEnter = true;
         }
         return true;
       } else {
         if (sprite.isEnter) {
-          const handlers = sprite._eventMap["mouseout"];
           if (sprite._eventMap["mouseout"]) {
-            for (let j = 0; j < handlers.length; j++) {
-              handlers[j].call(sprite, this.eventObj);
-            }
+            const handlers = sprite._eventMap["mouseout"];
+            this.eventQueue["mouseout"].unshift({
+              handlers,
+              event: this.eventObj,
+              trigger: sprite,
+            });
           }
           sprite.isEnter = false;
         }

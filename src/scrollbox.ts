@@ -1,4 +1,4 @@
-import { ratio, platform, isMac } from "./config";
+import { ratio, getPlatform, isMac } from "./config";
 import Sprite from "./sprite";
 import TWEEN, { Tween } from "@tweenjs/tween.js";
 
@@ -6,11 +6,12 @@ class ScrollBox extends Sprite {
   contentWidth: number;
   contentHeight: number;
   contentVes: Sprite;
-  scrollbarXWidth = platform === "pc" ? 10 : 0;
+  scrollbarXWidth = getPlatform() === "pc" ? 10 : 0;
   scrollbarX: Sprite;
   scrollbarXSlide: Sprite;
   scrollbarY: Sprite;
   scrollbarYSlide: Sprite;
+  needStop = true;
   _append: Function;
   constructor(argv: any) {
     super(argv);
@@ -56,21 +57,9 @@ class ScrollBox extends Sprite {
       moveY = touch.clientY * ratio;
       const tmpX = beginX + moveX - startX,
         tmpY = beginY + moveY - startY;
-      if (tmpX > 0 || _this.contentWidth < _this.width) {
-        ves.x = 0;
-      } else if (tmpX < _this.width - _this.contentWidth) {
-        ves.x = _this.width - _this.contentWidth;
-      } else {
-        ves.x = tmpX;
-      }
 
-      if (tmpY > 0 || _this.contentHeight < _this.height) {
-        ves.y = 0;
-      } else if (tmpY < _this.height - _this.contentHeight) {
-        ves.y = _this.height - _this.contentHeight;
-      } else {
-        ves.y = tmpY;
-      }
+      _this.wheel(tmpX, tmpY);
+
       startms = Date.now();
       disX = lastX - moveX;
       disY = lastY - moveY;
@@ -78,6 +67,7 @@ class ScrollBox extends Sprite {
       lastY = moveY;
     };
     const touchstart = function (ev) {
+      ev.stopElemPropagation();
       const touch = ev.targetTouches[0];
       startX = touch.clientX * ratio;
       startY = touch.clientY * ratio;
@@ -122,8 +112,9 @@ class ScrollBox extends Sprite {
     let wheelDisX, wheelDisY, wheelLastX, wheelLastY;
 
     this.on("wheel", function (ev) {
-      const tmpX = ves.x - ev.deltaX * (isMac ? 1 : 2);
-      const tmpY = ves.y - ev.deltaY * (isMac ? 1 : 2);
+      // _this.needStop && ev.stopElemPropagation();
+      const tmpX = ves.x - ev.deltaX * (isMac() ? 1 : 2);
+      const tmpY = ves.y - ev.deltaY * (isMac() ? 1 : 2);
 
       wheelDisX = wheelLastX - tmpX;
       wheelDisY = wheelLastY - tmpY;
@@ -155,7 +146,7 @@ class ScrollBox extends Sprite {
         });
       }
 
-      _this.wheel(tmpX, tmpY);
+      _this.wheel(tmpX, tmpY, ev);
     });
   }
   stopInertia() {
@@ -170,7 +161,8 @@ class ScrollBox extends Sprite {
     }
   }
   addScrollbarY() {
-    if (platform === "pc") {
+    const _this = this;
+    if (getPlatform() === "pc") {
       const scrollbarY = new Sprite({
         width: 10,
         height: this.height,
@@ -187,7 +179,35 @@ class ScrollBox extends Sprite {
         bgColor: "rgba(0,0,0,0.4)",
       });
 
-      const mousedown = function () {};
+      let beginY, downY, moveY;
+      const mousemove = function (ev) {
+        moveY = ev.clientY * ratio;
+        const tmpY = beginY + moveY - downY;
+
+        _this.wheel(
+          _this.contentVes.x,
+
+          -(tmpY / (scrollbarY.height - scrollbarYSlide.height)) *
+            (_this.contentVes.height - _this.height)
+        );
+      };
+
+      const mousedown = function (ev) {
+        ev.stopElemPropagation();
+        downY = ev.clientY * ratio;
+        beginY = scrollbarYSlide.y;
+        document.addEventListener("mousemove", mousemove, false);
+
+        _this.stopInertia();
+      };
+
+      document.addEventListener(
+        "mouseup",
+        () => {
+          document.removeEventListener("mousemove", mousemove);
+        },
+        false
+      );
 
       scrollbarYSlide.on("mousedown", mousedown);
 
@@ -198,22 +218,28 @@ class ScrollBox extends Sprite {
       this.scrollbarYSlide = scrollbarYSlide;
     }
   }
-  wheel(x, y) {
+  wheel(x, y, ev?: any) {
     const ves = this.contentVes;
     if (x > 0 || this.contentWidth < this.width) {
+      this.needStop = false;
       ves.x = 0;
     } else if (x < this.width - this.contentWidth) {
+      this.needStop = false;
       ves.x = this.width - this.contentWidth;
     } else {
       ves.x = x;
+      isMac() && ev?.stopElemPropagation();
     }
 
     if (y > 0 || this.contentHeight < this.height) {
+      this.needStop = false;
       ves.y = 0;
     } else if (y < this.height - this.contentHeight) {
+      this.needStop = false;
       ves.y = this.height - this.contentHeight;
     } else {
       ves.y = y;
+      ev?.stopElemPropagation();
     }
 
     this.scrollbarYSlide.y =
