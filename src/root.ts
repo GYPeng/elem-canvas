@@ -203,38 +203,12 @@ class Root extends Sprite {
       },
       false
     );
-
-    // this.canvas.addEventListener(
-    //   "wheel",
-    //   (event: TouchEvent) => {
-    //     event.preventDefault();
-    //     const handlers = this._eventMap["wheel"];
-    //     if (this._eventMap["wheel"]) {
-    //       for (let j = 0; j < handlers.length; j++) {
-    //         handlers[j].call(this, event);
-    //       }
-    //     }
-    //     this.eventColorMap.forEach((m, i) => {
-    //       const handlers = m.trigger._eventMap["wheel"];
-    //       if (m.trigger._eventMap["wheel"]) {
-    //         for (let j = 0; j < handlers.length; j++) {
-    //           handlers[j].call(m.trigger, event);
-    //         }
-    //       }
-    //     });
-    //   },
-    //   false
-    // );
   }
   async frame(time) {
     TWEEN.update(time);
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.currentEventColor = "#000001";
     this.eventColorMap = [];
-    // try {
-    //   this.ctx.reset();
-    //   this.ghostCtx.reset();
-    // } catch (e) {}
     await this.deep(this.children);
     this.eventConsed = true;
     this.eventObj = null;
