@@ -58,7 +58,7 @@ class ScrollBox extends Sprite {
       const tmpX = beginX + moveX - startX,
         tmpY = beginY + moveY - startY;
 
-      _this.wheel(tmpX, tmpY);
+      _this.wheel(tmpX, tmpY, ev);
 
       startms = Date.now();
       disX = lastX - moveX;
