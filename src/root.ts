@@ -249,9 +249,30 @@ class Root extends Sprite {
   triggerEventQueue() {
     for (let eventType in this.eventQueue) {
       const queue = this.eventQueue[eventType];
+      let lastTrigger;
       for (let i = 0; i < queue.length; i++) {
         const { handlers, trigger, event } = queue[i];
         let isStop;
+
+        /**
+         * 确保事件冒泡链条为文档上的嵌套关系
+         */
+        let inAChain = !lastTrigger ? true : false; // 事件冒泡要求必须是文档上的嵌套关系 且不受定位属性影响
+        let tmp = lastTrigger;
+        while (tmp && tmp.parent) {
+          if (tmp.parent === trigger) {
+            inAChain = true;
+          }
+          tmp = tmp.parent;
+        }
+        if (!inAChain) {
+          break;
+        }
+        /**
+         * 确保事件冒泡链条为文档上的嵌套关系
+         */
+
+        lastTrigger = trigger;
         for (let j = 0; j < handlers?.length; j++) {
           handlers[j].call(trigger, event);
           if (event["elemStop"]) {
