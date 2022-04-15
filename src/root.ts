@@ -333,8 +333,10 @@ class Root extends Sprite {
             x + width < parent.viewArea.clipX ||
             x > parent.viewArea.clipX + parent.viewArea.clipWidth
           ) {
-            clipWidth = parent.viewArea.clipWidth || this.width;
-            clipX = parent.viewArea.clipX || 0;
+            // clipWidth = parent.viewArea.clipWidth;
+            // clipX = parent.viewArea.clipX || 0;
+            clipX = 0;
+            clipWidth = 0;
           } else {
             if (x > parent.viewArea.clipX) {
               clipX = x;
@@ -345,7 +347,11 @@ class Root extends Sprite {
                 clipWidth = width;
               } else {
                 clipWidth =
-                  parent.viewArea.clipWidth + parent.viewArea.clipX - clipX;
+                  //   parent.viewArea.clipWidth + parent.viewArea.clipX - clipX;
+                  width -
+                  (x +
+                    width -
+                    (parent.viewArea.clipWidth + parent.viewArea.clipX));
               }
             } else {
               clipX = parent.viewArea.clipX;
@@ -353,7 +359,8 @@ class Root extends Sprite {
                 parent.viewArea.clipWidth + parent.viewArea.clipX >
                 x + width
               ) {
-                clipWidth = width;
+                // clipWidth = width;
+                clipWidth = width - (clipX - x);
               } else {
                 clipWidth = parent.viewArea.clipWidth;
               }
@@ -378,33 +385,55 @@ class Root extends Sprite {
           }
         }
       }
+
       if (parentOverflowY === "hidden") {
         if (overflowY === "hidden") {
+          /**
+           * bottom 小于父级top
+           * 或者
+           * top 大于父级bottom
+           */
           if (
             y + height < parent.viewArea.clipY ||
             y > parent.viewArea.clipY + parent.viewArea.clipHeight
           ) {
-            clipHeight = parent.viewArea.clipHeight || this.height;
-            clipY = parent.viewArea.clipY || 0;
+            // clipHeight = parent.viewArea.clipHeight;
+            // clipY = parent.viewArea.clipY || 0;
+            clipHeight = 0;
+            clipY = 0;
           } else {
+            /**
+             * 完全在父级内部或者部分与父级重叠
+             */
+            // top 大于父级top
             if (y > parent.viewArea.clipY) {
               clipY = y;
+              // bottom 小于父级bottom
               if (
                 parent.viewArea.clipHeight + parent.viewArea.clipY >
                 y + height
               ) {
                 clipHeight = height;
               } else {
+                // bottom 大于父级bottom
                 clipHeight =
-                  parent.viewArea.clipHeight + parent.viewArea.clipY - clipY;
+                  // parent.viewArea.clipHeight + parent.viewArea.clipY - clipY;
+                  height -
+                  (y +
+                    height -
+                    (parent.viewArea.clipHeight + parent.viewArea.clipY));
               }
             } else {
+              // top 小于父级top
               clipY = parent.viewArea.clipY;
+
+              // bottom 小于父级bottom
               if (
                 parent.viewArea.clipHeight + parent.viewArea.clipY >
                 y + height
               ) {
-                clipHeight = height;
+                clipHeight = height - (clipY - y);
+                // bottom 大于父级bottom
               } else {
                 clipHeight = parent.viewArea.clipHeight;
               }
@@ -430,7 +459,12 @@ class Root extends Sprite {
         }
       }
 
-      item.viewArea = { clipX, clipY, clipWidth, clipHeight };
+      item.viewArea = {
+        clipX,
+        clipY,
+        clipWidth: Math.max(clipWidth, 0),
+        clipHeight: Math.max(clipHeight, 0),
+      };
 
       this.ghostCtx.save();
       this.ghostCtx.rect(clipX, clipY, clipWidth, clipHeight);
