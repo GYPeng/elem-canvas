@@ -11,7 +11,6 @@ class ScrollBox extends Sprite {
   scrollbarXSlide: Sprite;
   scrollbarY: Sprite;
   scrollbarYSlide: Sprite;
-  needStop = true;
   _append: Function;
   constructor(argv: any) {
     super(argv);
@@ -112,7 +111,6 @@ class ScrollBox extends Sprite {
     let wheelDisX, wheelDisY, wheelLastX, wheelLastY;
 
     this.on("wheel", function (ev) {
-      // _this.needStop && ev.stopElemPropagation();
       const tmpX = ves.x - ev.deltaX * (isMac() ? 1 : 2);
       const tmpY = ves.y - ev.deltaY * (isMac() ? 1 : 2);
 
@@ -121,7 +119,7 @@ class ScrollBox extends Sprite {
       wheelLastX = tmpX;
       wheelLastY = tmpY;
 
-      if (Date.now() - startms < 500) {
+      if (!isMac() && Date.now() - startms < 500) {
         const to = { x: ves.x, y: ves.y };
         if (Math.abs(disY) > 30) {
           to.y = ves.y - disY * 10;
@@ -168,7 +166,6 @@ class ScrollBox extends Sprite {
         height: this.height,
         bgColor: "rgba(0,0,0,0.1)",
         x: this.width / ratio - 10,
-        zIndex: 99999,
       });
       const scrollbarYSlide = new Sprite({
         width: 10,
@@ -221,10 +218,8 @@ class ScrollBox extends Sprite {
   wheel(x, y, ev?: any) {
     const ves = this.contentVes;
     if (x > 0 || this.contentWidth < this.width) {
-      this.needStop = false;
       ves.x = 0;
     } else if (x < this.width - this.contentWidth) {
-      this.needStop = false;
       ves.x = this.width - this.contentWidth;
     } else {
       ves.x = x;
@@ -232,10 +227,8 @@ class ScrollBox extends Sprite {
     }
 
     if (y > 0 || this.contentHeight < this.height) {
-      this.needStop = false;
       ves.y = 0;
     } else if (y < this.height - this.contentHeight) {
-      this.needStop = false;
       ves.y = this.height - this.contentHeight;
     } else {
       ves.y = y;
